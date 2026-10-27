@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мовна гра УПР</title>
+<meta name="description" content="Гра до Дня української писемності та мови для команди ГО «Український професійний розвиток»">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0AA954;
+    --green-dark:#4CA75D;
+    --green-soft:#E8F6EC;
+    --yellow:#F3D34A;
+    --yellow-soft:#FDF5D9;
+    --red:#E0503C;
+    --red-soft:#FCE9E6;
+    --ink:#1C2A21;
+    --muted:#5D6B62;
+    --bg:#FFFFFF;
+    --line:#D9E6DD;
+    --radius:28px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:'Montserrat',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* фірмові «крапки» в кутах */
+  body::before,body::after{
+    content:"";position:fixed;width:150px;height:110px;pointer-events:none;z-index:0;
+    background-image:radial-gradient(var(--yellow) 2.2px,transparent 2.6px);
+    background-size:18px 18px;opacity:.75;
+  }
+  body::before{top:18px;left:18px}
+  body::after{bottom:18px;right:18px}
+
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:28px 16px 48px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;letter-spacing:.04em;color:var(--green);text-transform:uppercase;line-height:1.2}
+  .brand img{height:64px;width:auto;display:block}
+  .brand .mark{width:44px;height:44px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:16px;letter-spacing:0}
+  .date-pill{border:2px solid var(--green);color:var(--green);border-radius:999px;padding:6px 14px;font-weight:700;font-size:13px;white-space:nowrap}
+
+  .card{background:#fff;border:2px solid var(--green);border-radius:var(--radius);padding:28px 24px}
+  h1{font-weight:900;text-transform:uppercase;color:var(--green);font-size:clamp(26px,6vw,40px);line-height:1.1;margin-bottom:14px}
+  .lead{font-style:italic;color:var(--muted);font-size:16px;margin-bottom:22px}
+  .banner{
+    display:inline-block;background:var(--green);color:#fff;border-radius:999px;
+    padding:12px 26px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;font-size:clamp(16px,4vw,22px);margin-bottom:22px
+  }
+  .rules{list-style:none;display:grid;gap:10px;margin-bottom:24px}
+  .rules li{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+  .rules li::before{content:"";flex:0 0 10px;height:10px;margin-top:6px;border-radius:50%;background:var(--yellow)}
+  label{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+  input[type=text]{
+    width:100%;font:inherit;font-size:16px;padding:14px 18px;border:2px solid var(--line);border-radius:999px;outline:none;margin-bottom:18px
+  }
+  input[type=text]:focus{border-color:var(--green)}
+  .btn{
+    font:inherit;font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:.03em;
+    background:var(--green);color:#fff;border:none;border-radius:999px;padding:15px 30px;cursor:pointer;
+    transition:background .15s,transform .1s
+  }
+  .btn:hover{background:#08914A}
+  .btn:active{transform:scale(.98)}
+  .btn.ghost{background:#fff;color:var(--green);border:2px solid var(--green)}
+  .btn.ghost:hover{background:var(--green-soft)}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.hard{background:var(--ink)}
+  .btn.hard:hover{background:#000}
+  .level-pill{display:inline-block;background:var(--ink);color:#fff;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+
+  /* питання */
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-weight:700;font-size:14px;color:var(--muted)}
+  .score-pill{background:var(--yellow-soft);color:var(--ink);border-radius:999px;padding:4px 12px}
+  .progress{height:10px;background:var(--green-soft);border-radius:999px;overflow:hidden;margin-bottom:22px}
+  .progress span{display:block;height:100%;background:var(--green);border-radius:999px;transition:width .3s}
+  .q-head{background:var(--green);color:#fff;border-radius:22px;padding:18px 22px;margin-bottom:18px}
+  .q-num{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.85;margin-bottom:4px}
+  .q-text{font-weight:800;font-size:clamp(18px,4.2vw,22px);line-height:1.3}
+  .options{display:grid;gap:12px;margin-bottom:18px}
+  .opt{
+    font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer;
+    background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px 18px;
+    display:flex;gap:12px;align-items:center;transition:border-color .15s,background .15s
+  }
+  .opt:hover:not(:disabled){border-color:var(--green)}
+  .opt .letter{flex:0 0 32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--green-soft);color:var(--green-dark);font-weight:800}
+  .opt:disabled{cursor:default}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.correct .letter{background:var(--green);color:#fff}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+  .opt.wrong .letter{background:var(--red);color:#fff}
+  .explain{border-left:6px solid var(--yellow);background:var(--yellow-soft);border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:15px}
+  .explain b{display:block;margin-bottom:4px}
+  .actions{display:flex;justify-content:flex-end}
+
+  /* результат */
+  .result-num{font-weight:900;color:var(--green);font-size:clamp(56px,16vw,96px);line-height:1}
+  .result-num small{font-size:.4em;color:var(--muted)}
+  .badge{display:inline-block;background:var(--yellow);border-radius:999px;padding:8px 18px;font-weight:800;margin:14px 0 10px}
+  .review{list-style:none;display:grid;gap:8px;margin:20px 0 24px}
+  .review li{display:flex;gap:10px;font-size:14px;align-items:flex-start}
+  .review .dot{flex:0 0 22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .hidden{display:none !important}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+  @media (max-width:520px){
+    .card{padding:22px 16px}
+    .date-pill{display:none}
+    body::before,body::after{width:90px;height:70px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><img src="data:image/png;base64,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" alt="Український професійний розвиток"></div>
+    <div class="date-pill">27 жовтня</div>
+  </header>
+
+  <!-- СТАРТ -->
+  <section id="start" class="card">
+    <h1>Мовний<br>чекап команди</h1>
+    <p class="lead">До Дня української писемності та мови — питання про те, як ми пишемо, говоримо й листуємося щодня</p>
+    <div class="banner">Перевір себе</div>
+    <ul class="rules">
+      <li>10 питань у звичайному рівні та 7 у хардкорі, у кожному одна правильна відповідь</li>
+      <li>Після відповіді — коротке пояснення</li>
+      <li>«Хардкор» — 7 справді підступних питань: правопис 2019, кличний відмінок, відмінювання числівників і канцеляризми</li>
+      <li>Наприкінці — ваш результат і скриншот для командного чату</li>
+    </ul>
+    <label for="name">Як вас звати?</label>
+    <input id="name" type="text" placeholder="Наприклад, Олена" maxlength="40" autocomplete="given-name">
+    <div class="row">
+      <button class="btn" id="startBtn">Звичайний рівень</button>
+      <button class="btn hard" id="hardBtn">🔥 Хардкор</button>
+    </div>
+  </section>
+
+  <!-- ПИТАННЯ -->
+  <section id="quiz" class="card hidden">
+    <span class="level-pill hidden" id="levelPill">🔥 Хардкор</span>
+    <div class="top"><span id="counter">Питання 1 з 10</span><span class="score-pill" id="scorePill">0 балів</span></div>
+    <div class="progress"><span id="bar" style="width:0%"></span></div>
+    <div class="q-head">
+      <div class="q-num" id="qnum">Питання 1</div>
+      <div class="q-text" id="qtext"></div>
+    </div>
+    <div class="options" id="options"></div>
+    <div class="explain hidden" id="explain"></div>
+    <div class="actions"><button class="btn hidden" id="nextBtn">Далі</button></div>
+  </section>
+
+  <!-- РЕЗУЛЬТАТ -->
+  <section id="result" class="card hidden">
+    <p class="lead" id="resultName" style="margin-bottom:8px"></p>
+    <div class="result-num"><span id="final">0</span><small id="total">/10</small></div>
+    <div class="badge" id="badge"></div>
+    <p id="verdict"></p>
+    <ul class="review" id="review"></ul>
+    <div class="row">
+      <button class="btn" id="againBtn">Зіграти ще раз</button>
+      <button class="btn ghost" id="copyBtn">Скопіювати результат</button>
+    </div>
+  </section>
+
+  <footer>ГО «Український професійний розвиток» · День української писемності та мови</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "Чому День української писемності та мови з 2023 року відзначаємо 27 жовтня, а не 9 листопада?",
+    a: ["Так вирішили мовознавці на конференції", "Через перехід церков на новоюліанський календар — це день вшанування Нестора Літописця", "Бо 27 жовтня народився Іван Котляревський"],
+    c: 1,
+    e: "Свято завжди припадало на день Нестора Літописця. Після переходу ПЦУ та УГКЦ на новоюліанський календар цей день перемістився на 27 жовтня."
+  },
+  {
+    q: "Хто вперше за історію акції вдвох читає Радіодиктант національної єдності 2026?",
+    a: ["Наталія Сумська та Євгенія Кузнєцова", "Артур Пройдаков та Даша Астаф'єва", "Артур Дронь та Сергій Жадан"],
+    c: 1,
+    e: "Читають учитель Артур Пройдаков і співачка та волонтерка Даша Астаф'єва, а текст «Лист, який не закінчується» написав Артур Дронь."
+  },
+  {
+    q: "Пишемо службову записку. Як правильно?",
+    a: ["Згідно наказу директора", "Згідно з наказом директора", "Згідно із наказу директора"],
+    c: 1,
+    e: "«Згідно» вимагає прийменника «з» та орудного відмінка: згідно з наказом, згідно з планом."
+  },
+  {
+    q: "Звіт треба здати…",
+    a: ["на протязі тижня", "протягом тижня", "в протязі тижня"],
+    c: 1,
+    e: "Про час кажемо «протягом» або «упродовж». «Протяг» — це рух повітря в кімнаті 🙂"
+  },
+  {
+    q: "Як грамотно почати перелік у листі?",
+    a: ["Порядок денний наступний:", "Порядок денний такий:", "Порядок денний слідуючий:"],
+    c: 1,
+    e: "Перед переліком кажемо «такий». «Наступний» означає «той, що йде після»: наступний пункт, наступна зустріч."
+  },
+  {
+    q: "Пишемо партнерці. Як правильно звернутися?",
+    a: ["Шановна пані Ірина!", "Шановна пані Ірино!", "Шановна пані Ірині!"],
+    c: 1,
+    e: "У звертаннях використовуємо кличний відмінок: пані Ірино, пане Андрію, колего."
+  },
+  {
+    q: "Де правильний наголос?",
+    a: ["чЕрговий", "черговИй", "чергОвий"],
+    c: 1,
+    e: "Правильно: черговИй, черговА зустріч, черговИй звіт."
+  },
+  {
+    q: "Проєкт триватиме…",
+    a: ["пів року", "півроку", "пів-року"],
+    c: 1,
+    e: "За чинним правописом «пів» із загальною назвою в називному відмінку пишемо разом: півроку, півгодини, півсвіту."
+  },
+  {
+    q: "Яка літера найчастіше трапляється в українських текстах?",
+    a: ["А", "О", "Н"],
+    c: 1,
+    e: "Літера «О» — лідерка за частотою вживання в українській мові."
+  },
+  {
+    q: "Колега переміг у вікторині. Що скажете?",
+    a: ["Твоя відповідь вірна!", "Твоя відповідь правильна!", "Обидва варіанти однаково доречні"],
+    c: 1,
+    e: "«Вірний» — це відданий (вірний друг, вірна собака). Відповідь, рішення чи розрахунок бувають «правильними»."
+  }
+];
+const HARD = [
+  {
+    q: "У якому слові наголос поставлено НЕПРАВИЛЬНО?",
+    a: ["кіломЕтр", "зручнИй", "дОговір"],
+    c: 2,
+    e: "Правильно: договІр, договОри. А кіломЕтр і зручнИй — саме так, хоч і звучать незвично."
+  },
+  {
+    q: "Чинний правопис дозволяє два варіанти родового відмінка: «немає радості» і «немає…»",
+    a: ["радости", "радостя", "радостій"],
+    c: 0,
+    e: "Правопис 2019 року допускає закінчення -и в іменниках на -ть після приголосного та в словах кров, любов, осінь, сіль, Русь: радости, любови, осени."
+  },
+  {
+    q: "Як правильно за правописом 2019 року?",
+    a: ["пів Європи", "пів-Європи", "півЄвропи"],
+    c: 1,
+    e: "Із загальними назвами «пів» пишемо разом (півроку, півсела), а перед власною назвою — через дефіс: пів-Європи, пів-Києва."
+  },
+  {
+    q: "Пишемо офіційного листа. Як звернутися до Івана Петровича?",
+    a: ["Шановний пане Іван Петрович!", "Шановний пане Іване Петрович!", "Шановний пане Іване Петровичу!"],
+    c: 2,
+    e: "У кличному відмінку стоять і ім'я, і по батькові: пане Іване Петровичу, пані Олено Іванівно."
+  },
+  {
+    q: "«Донор погодився з ___ гривнями на закупівлю». Яка форма числівника 500 правильна?",
+    a: ["п'ятистами", "п'ятьмастами", "п'ятисотьма"],
+    c: 1,
+    e: "Орудний відмінок: п'ятьмастами (або п'ятьомастами). «П'ятистами» — це давальний: дякуємо п'ятистам учасникам."
+  },
+  {
+    q: "Як грамотно написати у звіті?",
+    a: ["Організація прийняла міри", "Організація вжила заходів", "Організація прийняла заходи"],
+    c: 1,
+    e: "«Приймати міри» — калька з російської. Українською — вживати заходів."
+  },
+  {
+    q: "Документи працівника зберігаються у відділі кадрів. Це…",
+    a: ["особиста справа", "особова справа", "персональна справа"],
+    c: 1,
+    e: "«Особовий» стосується працівника як одиниці обліку: особова справа, особовий рахунок. «Особистий» — приватний: особисте життя."
+  }
+];
+const LETTERS = ["А","Б","В","Г"];
+
+const $ = id => document.getElementById(id);
+let idx = 0, score = 0, answers = [], player = "", hard = false, Q = QUESTIONS, order = [];
+
+function show(id){ ["start","quiz","result"].forEach(s => $(s).classList.toggle("hidden", s !== id)); window.scrollTo({top:0,behavior:"smooth"}); }
+function balls(n){ const m10=n%10, m100=n%100; if(m10===1&&m100!==11) return n+" бал"; if(m10>=2&&m10<=4&&(m100<12||m100>14)) return n+" бали"; return n+" балів"; }
+
+function render(){
+  const item = Q[idx];
+  $("counter").textContent = `Питання ${idx+1} з ${Q.length}`;
+  $("qnum").textContent = `Питання ${idx+1}`;
+  $("qtext").textContent = item.q;
+  $("bar").style.width = (idx/Q.length*100) + "%";
+  $("scorePill").textContent = balls(score);
+  $("explain").classList.add("hidden");
+  $("nextBtn").classList.add("hidden");
+  const box = $("options"); box.innerHTML = "";
+  order = item.a.map((_,i) => i);
+  for(let k = order.length - 1; k > 0; k--){ const j = Math.floor(Math.random()*(k+1)); [order[k], order[j]] = [order[j], order[k]]; }
+  order.forEach((orig,i) => { const text = item.a[orig];
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<span class="letter">${LETTERS[i]}</span><span></span>`;
+    b.lastChild.textContent = text;
+    b.onclick = () => choose(orig);
+    box.appendChild(b);
+  });
+}
+
+function choose(i){
+  const item = Q[idx], opts = $("options").children, ok = i === item.c;
+  const posC = order.indexOf(item.c), posI = order.indexOf(i);
+  [...opts].forEach(o => o.disabled = true);
+  opts[posC].classList.add("correct");
+  if(!ok) opts[posI].classList.add("wrong");
+  if(ok) score++;
+  answers.push(ok);
+  $("scorePill").textContent = balls(score);
+  $("explain").innerHTML = `<b>${ok ? "Правильно! 🎉" : "Майже! Правильна відповідь — " + LETTERS[posC]}</b>`;
+  $("explain").appendChild(document.createTextNode(item.e));
+  $("explain").classList.remove("hidden");
+  $("nextBtn").textContent = idx === Q.length-1 ? "Мій результат" : "Далі";
+  $("nextBtn").classList.remove("hidden");
+  $("nextBtn").focus();
+}
+
+function finish(){
+  $("bar").style.width = "100%";
+  $("final").textContent = score;
+  $("total").textContent = "/" + Q.length;
+  const pct = score / Q.length;
+  $("resultName").textContent = player ? `${player}, ваш результат:` : "Ваш результат:";
+  let badge, verdict;
+  if(hard && pct >= .85){ badge = "👑 Мовний гуру УПР"; verdict = "Неймовірно! Навіть хардкор вам не страшний — ви офіційний мовний консультант команди."; }
+  else if(pct >= .9){ badge = "🏆 Мовний амбасадор УПР"; verdict = "Бездоганно! Вашим листам може позаздрити будь-який редактор."; }
+  else if(pct >= .7){ badge = "💪 Впевнений знавець"; verdict = "Дуже добре! Ще кілька нюансів — і ви на вершині."; }
+  else if(pct >= .4){ badge = "📚 На правильному шляху"; verdict = "Непогано! Пояснення з гри — чудова шпаргалка для робочого листування."; }
+  else { badge = "🌱 Час для мовного апгрейду"; verdict = "Кожен експерт колись починав. Пройдіть гру ще раз — тепер ви знаєте відповіді!"; }
+  $("badge").textContent = badge;
+  $("verdict").textContent = verdict;
+  const r = $("review"); r.innerHTML = "";
+  Q.forEach((q,i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="dot" style="background:${answers[i] ? "var(--green)" : "var(--red)"}">${answers[i] ? "✓" : "✕"}</span><span></span>`;
+    li.lastChild.textContent = `${i+1}. ${q.a[q.c]}`;
+    r.appendChild(li);
+  });
+  show("result");
+}
+
+function begin(isHard){ hard = isHard; Q = hard ? HARD : QUESTIONS; player = $("name").value.trim(); idx = 0; score = 0; answers = []; $("levelPill").classList.toggle("hidden", !hard); render(); show("quiz"); }
+$("startBtn").onclick = () => begin(false);
+$("hardBtn").onclick = () => begin(true);
+$("name").addEventListener("keydown", e => { if(e.key === "Enter") $("startBtn").click(); });
+$("nextBtn").onclick = () => { idx++; idx < Q.length ? render() : finish(); };
+$("againBtn").onclick = () => { $("name").value = player; show("start"); };
+$("copyBtn").onclick = async () => {
+  const text = `${player ? player + ": " : ""}${score}/${Q.length} у мовній грі УПР${hard ? " (🔥 хардкор)" : ""} до Дня писемності та мови! ${$("badge").textContent}`;
+  try { await navigator.clipboard.writeText(text); $("copyBtn").textContent = "Скопійовано ✓"; }
+  catch(e){ prompt("Скопіюйте результат:", text); }
+  setTimeout(() => $("copyBtn").textContent = "Скопіювати результат", 2000);
+};
+</script>
+</body>
+</html>
